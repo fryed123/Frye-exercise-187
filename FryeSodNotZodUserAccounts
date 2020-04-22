@@ -1,0 +1,165 @@
+//AUTHOR: Darren Frye
+//COURSE: CPT 187
+//PURPOSE: Provides solution code for another SodNotZod program using multiple supportive
+//classes with method overloading, object passing, and now file processing/searching.
+//CREATEDATE: 4/16/2020
+
+package edu.cpt187.frye.participation;
+
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Scanner;
+
+public class UserAccounts 
+{
+	//ATTRIBUTES
+	
+	private final boolean FILE_FOUND = true;
+	private final boolean FILE_NOT_FOUND = false;
+	private final int NOT_FOUND = -1;
+	private final int RESET_VALUE  = 0;
+	private final int MAXIMUM_RECORDS = 50;
+	
+	private String[] userNames = new String[MAXIMUM_RECORDS];
+	private String[] passwords = new String[MAXIMUM_RECORDS];
+	
+	private boolean fileFoundFlag = false;
+	private String masterFileName = "";
+	private int recordCount = 0;
+	private int searchedIndex = 0;
+	
+	//BEHAVIORS
+	
+	//Non-default constructor
+	public UserAccounts(String borrowedFileName) 
+	{
+		masterFileName = borrowedFileName;
+	}//end constructor
+	
+	//Setters
+	
+	public void setUserAccountArrays()
+	{
+		recordCount = RESET_VALUE;
+
+		try
+		{
+			Scanner infile = new Scanner(new FileInputStream(masterFileName));
+
+			while(infile.hasNext() == true && recordCount < MAXIMUM_RECORDS)
+			{
+				userNames[recordCount] = infile.next();
+				passwords[recordCount] = infile.next();
+
+				recordCount++;
+			}
+
+			infile.close();
+		}
+
+		catch(IOException ex)
+		{
+			recordCount = NOT_FOUND;
+		}
+
+	}
+	
+	public void setSearchedIndex(String borrowedUserName)
+	{
+		searchedIndex = getSeqSearch(borrowedUserName);
+	}
+	
+	public void setSearchedIndex(String borrowedUserName, String borrowedPassword)
+	{
+		searchedIndex = getSeqSearch(borrowedUserName);
+		
+		getPasswordMatch(borrowedPassword);
+	}
+	
+	public void setWriteOneRecord(String borrowedUserName, String borrowedPassword)
+	{
+		try
+		{
+			PrintWriter filePW = new PrintWriter(new FileWriter(masterFileName, true));
+
+			filePW.printf("%n%s\t%s%n", borrowedUserName, borrowedPassword);
+
+			fileFoundFlag = FILE_FOUND;
+
+			filePW.close();
+			
+			recordCount++;
+		}
+		catch(IOException ex)
+		{
+			fileFoundFlag = FILE_NOT_FOUND;
+		}
+	}
+	
+	//Getters
+	
+	public int getSeqSearch(String borrowedBorrowedUserName)
+	{
+		int localIndex = 0;
+		int localFound = NOT_FOUND;
+		
+		while(localIndex < recordCount)
+		{
+			if(borrowedBorrowedUserName == userNames[localIndex])
+			{
+				localFound = localIndex;
+				localIndex = recordCount;
+			}
+			else
+			{
+				localIndex++;
+			}
+		}
+		
+		return localFound;
+	}
+	
+	public boolean getPasswordMatch(String borrowedBorrowedPassword)
+	{
+		int localIndex = 0;
+		boolean localFound = false;
+
+		while(localIndex < recordCount)
+		{
+			if(borrowedBorrowedPassword == passwords[localIndex])
+			{
+				localFound = true;
+				localIndex = recordCount;
+			}
+			else
+			{
+				localIndex++;
+			}
+		}
+
+		return localFound;
+	}
+	
+	public String getFileFoundFlag()
+	{
+		return String.valueOf(fileFoundFlag);
+	}
+	
+	public String getFileName()
+	{
+		return masterFileName;
+	}
+	
+	public int getRecordCount()
+	{
+		return recordCount;
+	}
+	
+	public int getSearchedIndex()
+	{
+		return searchedIndex;
+	}
+
+}
